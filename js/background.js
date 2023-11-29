@@ -25,7 +25,7 @@ function execForMac(details) {
                           if (event.deltaX < 0) {
                             setTimeout(function() {
                                 window.close();
-                            }, 150);
+                            }, 200);
                           }
                         });
                       `
@@ -39,7 +39,7 @@ function execForWindows(details) {
                             if (event.button === 3) {
                                 setTimeout(function() {
                                     window.close();
-                                }, 150);
+                                }, 200);
                             }
                         });
                       `
