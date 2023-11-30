@@ -1,20 +1,26 @@
 {
-    "name": "Hello Extensions",
-    "description" : "Base Level Extension",
+    "manifest_version": 3,
+    "name": "Flop close new tab",
+    "description": "Quickly close the new tab if you do not need it.",
     "version": "1.0",
-    "manifest_version": 2,
-    "browser_action": {
+    "action": {
         "default_popup": "html/popup.html",
-        "default_icon": "img/popup.jpeg"
+        "default_icon": {
+            "16": "img/16.png",
+            "48": "img/48.png",
+            "128": "img/128.png"
+        }
     },
     "background": {
-        "scripts": ["js/background.js"],
-        "persistent": true
+        "service_worker": "js/background.js"
     },
     "permissions": [
         "webNavigation",
         "activeTab",
         "storage",
+        "scripting"
+    ],
+    "host_permissions": [
         "<all_urls>"
     ]
 }

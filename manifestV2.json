@@ -1,0 +1,20 @@
+{
+    "name": "Flop close new tab",
+    "description" : "quick close the new tab if you do not need it.",
+    "version": "1.0",
+    "manifest_version": 2,
+    "browser_action": {
+        "default_popup": "html/popup.html",
+        "default_icon": "img/popup.jpeg"
+    },
+    "background": {
+        "scripts": ["js/background.js"],
+        "persistent": true
+    },
+    "permissions": [
+        "webNavigation",
+        "activeTab",
+        "storage",
+        "<all_urls>"
+    ]
+}
