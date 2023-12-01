@@ -1,55 +1,82 @@
 chrome.runtime.onInstalled.addListener(function () {
-    console.log("success!")
+    // init cache.
+    storage(-500, 3);
 })
 
 function isMacOs() {
     return navigator.platform.toUpperCase().includes('MAC');
 }
 
+function storage(sliding_distance, click_num) {
+    chrome.storage.sync
+        .set({
+            sliding_distance: sliding_distance,
+            click_num: click_num
+        })
+        .then(() => {
+            console.log("Value is init!");
+        });
+}
+
 chrome.webNavigation.onCreatedNavigationTarget.addListener(function (details) {
     // is create new tab.
     if (details.sourceTabId && details.tabId) {
-        if (isMacOs()) {
-            execForMac(details);
-        } else {
-            execForWindows(details);
-        }
+        execForTouchpad(details);
+        execForMouse(details);
     }
 });
 
-function execForMac(details) {
+function execForTouchpad(details) {
     chrome.scripting.executeScript({
         target: {tabId: details.tabId},
         function: function () {
-            let i = 0;
-            window.addEventListener('wheel', function (event) {
-                if (event.deltaX < -20) {
-                    i += event.deltaX
+            let step = 0;
+            let sliding = -500;
+
+            chrome.storage.sync.get(["sliding_distance"]).then((result) => {
+                if (result !== undefined) {
+                    sliding = result.sliding_distance;
                 }
 
-                if (i < -500) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    window.close();
-                }
+                window.addEventListener('wheel', function (event) {
+                    if (event.deltaX < -20) {
+                        step += event.deltaX
+                    }
+
+                    if (step < sliding) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        window.close();
+                    }
+                });
             });
         }
     });
 }
 
-function execForWindows(details) {
+function execForMouse(details) {
     chrome.scripting.executeScript({
         target: {tabId: details.tabId},
         function: function () {
-            document.addEventListener('mousedown', function (event) {
-                if (event.button === 3) {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    setTimeout(function () {
-                        window.close();
-                    }, 200);
+
+            let clickNum = 3;
+            chrome.storage.sync.get(["click_num"]).then((result) => {
+                if (result !== undefined) {
+                    clickNum = result.click_num;
                 }
+
+                document.addEventListener('mousedown', function (event) {
+                    if (event.button === clickNum) {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        setTimeout(function () {
+                            window.close();
+                        }, 200);
+                    }
+                });
             });
+
+
         }
     });
 }

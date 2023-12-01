@@ -1,2 +1,2 @@
 # Flop
-chrme plugins for goback!
+Chrome plugins for close tab on back!

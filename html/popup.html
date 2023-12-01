@@ -1,15 +1,61 @@
 <html>
 <head>
-  <style>
-    button {
-      width: 60px;
-      height: 30px;
-      outline: none;
-    }
-  </style>
+    <style>
+        body {
+            width: 320px;
+        }
+    </style>
+    <link rel="stylesheet" href="../libs/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 </head>
 <body>
-<button id="changeColor">Bingo!</button>
-<script src="../js/popup.js"></script>
+<div class="container">
+    <h6>   </h6>
+</div>
+<div class="container">
+    <form class="form-horizontal">
+        <div class="form-group">
+            <label for="sliding_distance" class="col-sm-2 control-label">Touchpad</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="sliding_distance" placeholder="">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="click_num" class="col-sm-2 control-label">Mouse</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="click_num" placeholder="">
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-8">
+                <button type="submit" class="btn btn-default" id="save">Save</button>
+                <button type="submit" class="btn btn-default" id="reset">Reset</button>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="container">
+    <h5>Touchpad: Set the sliding distance of the touchpad. The smaller the value, the greater the sliding
+        distance.</h5>
+</div>
+<div class="container">
+    <h5>Mouse: Set the mouse button values. Generally, the left mouse button is 1, the right button is 2, the left
+        button of the scroll wheel is 3, and the right button of the scroll wheel is 4. Please set it according to the
+        actual situation of your mouse.</h5>
+</div>
+<div class="container">
+    <a href="https://github.com/TonyLiu0112/donate">
+        <img src="../img/jz.png" alt="" class="img-circle">
+    </a>
+    <a href="https://github.com/TonyLiu0112/Flop/issues">
+        <img src="../img/bug.png" alt="" class="img-circle">
+    </a>
+</div>
+
 </body>
+<script src="../libs/js/jquery-3.7.1.min.js"></script>
+<script src="../libs/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
+<script type="module" src="../js/storage.js"></script>
 </html>
