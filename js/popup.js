@@ -8,12 +8,27 @@ saveBtn.onclick = function (el) {
     let sliding_distance = document.getElementById(element_sliding_distance).value;
     let click_num = document.getElementById(element_click_num).value;
 
+    // check input value is number
+    if (!isNegativeNumber(sliding_distance)) {
+        alert("Touchpad must be a negative number");
+        return;
+    }
+
+    // check input value is number
+    if (!isNumber(click_num)) {
+        alert("Mouse must be a number");
+        return;
+    }
+
     // save to chrome storage.
-    storage(sliding_distance, click_num);
+    storage(parseFloat(sliding_distance), parseFloat(click_num));
+
+    alert("Success!")
 };
 
 resetBtn.onclick = function (el) {
     storage(-500, 3);
+    alert("Success!")
 }
 
 function storage(sliding_distance, click_num) {
@@ -25,6 +40,16 @@ function storage(sliding_distance, click_num) {
         .then(() => {
             console.log("Value is set");
         });
+}
+
+function isNegativeNumber(value) {
+    const numericValue = parseFloat(value);
+    return !isNaN(numericValue) && numericValue < 0;
+}
+
+function isNumber(value) {
+    const numericValue = parseFloat(value);
+    return !isNaN(numericValue) && numericValue >= 0;
 }
 
 window.onload = function () {
