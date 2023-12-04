@@ -4,7 +4,8 @@ chrome.runtime.onInstalled.addListener(function () {
 });
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (changeInfo && changeInfo.status === 'complete') {
+    if (tab && tab.url && !tab.url.startsWith("chrome://")
+        && changeInfo && changeInfo.status === 'complete') {
         execForTouchpad(tabId);
         execForMouse(tabId);
     }
