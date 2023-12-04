@@ -1,34 +1,26 @@
 chrome.runtime.onInstalled.addListener(function () {
     // init cache.
     storage(-500, 3);
-})
+});
 
-function isMacOs() {
-    return navigator.platform.toUpperCase().includes('MAC');
-}
-
-function storage(sliding_distance, click_num) {
-    chrome.storage.sync
-        .set({
-            sliding_distance: sliding_distance,
-            click_num: click_num
-        })
-        .then(() => {
-            console.log("Value is init!");
-        });
-}
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo && changeInfo.status === 'complete') {
+        execForTouchpad(tabId);
+        execForMouse(tabId);
+    }
+});
 
 chrome.webNavigation.onCreatedNavigationTarget.addListener(function (details) {
     // is create new tab.
     if (details.sourceTabId && details.tabId) {
-        execForTouchpad(details);
-        execForMouse(details);
+        execForTouchpad(details.tabId);
+        execForMouse(details.tabId);
     }
 });
 
-function execForTouchpad(details) {
+function execForTouchpad(tid) {
     chrome.scripting.executeScript({
-        target: {tabId: details.tabId},
+        target: {tabId: tid},
         function: function () {
             let step = 0;
             let sliding = -500;
@@ -54,9 +46,9 @@ function execForTouchpad(details) {
     });
 }
 
-function execForMouse(details) {
+function execForMouse(tid) {
     chrome.scripting.executeScript({
-        target: {tabId: details.tabId},
+        target: {tabId: tid},
         function: function () {
 
             let clickNum = 3;
@@ -79,4 +71,19 @@ function execForMouse(details) {
 
         }
     });
+}
+
+function isMacOs() {
+    return navigator.platform.toUpperCase().includes('MAC');
+}
+
+function storage(sliding_distance, click_num) {
+    chrome.storage.sync
+        .set({
+            sliding_distance: sliding_distance,
+            click_num: click_num
+        })
+        .then(() => {
+            console.log("Value is init!");
+        });
 }
