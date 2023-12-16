@@ -3,20 +3,18 @@ chrome.runtime.onInstalled.addListener(function () {
     storage(-500, 3);
 });
 
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    if (tab && tab.url && !tab.url.startsWith("chrome://")
-        && changeInfo && changeInfo.status === 'complete') {
-        execForTouchpad(tabId);
-        execForMouse(tabId);
-    }
-});
+// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+//     if (tab && tab.url && !tab.url.startsWith("chrome://")
+//         && changeInfo && changeInfo.status === 'complete') {
+//         execForTouchpad(tabId);
+//         execForMouse(tabId);
+//     }
+// });
 
-chrome.webNavigation.onCreatedNavigationTarget.addListener(function (details) {
+chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
     // is create new tab.
-    if (details.sourceTabId && details.tabId) {
-        execForTouchpad(details.tabId);
-        execForMouse(details.tabId);
-    }
+    execForTouchpad(details.tabId);
+    execForMouse(details.tabId);
 });
 
 function execForTouchpad(tid) {
@@ -51,7 +49,6 @@ function execForMouse(tid) {
     chrome.scripting.executeScript({
         target: {tabId: tid},
         function: function () {
-
             let clickNum = 3;
             chrome.storage.sync.get(["click_num"]).then((result) => {
                 if (result !== undefined) {
