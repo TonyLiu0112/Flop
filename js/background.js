@@ -3,21 +3,25 @@ chrome.runtime.onInstalled.addListener(function () {
     storage(-500, 3);
 });
 
-// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-//     if (tab && tab.url && !tab.url.startsWith("chrome://")
-//         && changeInfo && changeInfo.status === 'complete') {
-//         execForTouchpad(tabId);
-//         execForMouse(tabId);
-//     }
-// });
-
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
-    // is create new tab.
-    execForTouchpad(details.tabId);
-    execForMouse(details.tabId);
+
+    const dynamicKey = String(details.tabId);
+    chrome.storage.sync.get([dynamicKey]).then((result) => {
+
+        // TODO 这里如何控制并发执行？？
+        if (result === undefined || result[dynamicKey] === undefined) {
+
+            const keyValueObject = {};
+            keyValueObject[dynamicKey] = details.tabId;
+            chrome.storage.sync.set(keyValueObject, function() {});
+
+            injectScript4Touchpad(details.tabId);
+            injectScript4Mouse(details.tabId);
+        }
+    })
 });
 
-function execForTouchpad(tid) {
+function injectScript4Touchpad(tid) {
     chrome.scripting.executeScript({
         target: {tabId: tid},
         function: function () {
@@ -45,20 +49,26 @@ function execForTouchpad(tid) {
     });
 }
 
-function execForMouse(tid) {
+function injectScript4Mouse(tid) {
     chrome.scripting.executeScript({
+        args: [tid],
         target: {tabId: tid},
-        function: function () {
+        function: function (tabId) {
             let clickNum = 3;
             chrome.storage.sync.get(["click_num"]).then((result) => {
                 if (result !== undefined) {
                     clickNum = result.click_num;
                 }
-
                 document.addEventListener('mousedown', function (event) {
                     if (event.button === clickNum) {
                         event.stopPropagation();
                         event.preventDefault();
+                        chrome.storage.sync.get(String(tabId)).then((result) => {
+                            if (result !== undefined && result[String(tabId)] !== undefined) {
+                                chrome.storage.sync.remove(String(tabId), function() {});
+                            }
+                        })
+
                         setTimeout(function () {
                             window.close();
                         }, 200);
