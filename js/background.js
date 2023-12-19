@@ -8,12 +8,12 @@ chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
     const dynamicKey = String(details.tabId);
     chrome.storage.sync.get([dynamicKey]).then((result) => {
 
-        // TODO 这里如何控制并发执行？？
         if (result === undefined || result[dynamicKey] === undefined) {
 
             const keyValueObject = {};
             keyValueObject[dynamicKey] = details.tabId;
-            chrome.storage.sync.set(keyValueObject, function() {});
+            chrome.storage.sync.set(keyValueObject, function () {
+            });
 
             injectScript4Touchpad(details.tabId);
             injectScript4Mouse(details.tabId);
@@ -65,7 +65,8 @@ function injectScript4Mouse(tid) {
                         event.preventDefault();
                         chrome.storage.sync.get(String(tabId)).then((result) => {
                             if (result !== undefined && result[String(tabId)] !== undefined) {
-                                chrome.storage.sync.remove(String(tabId), function() {});
+                                chrome.storage.sync.remove(String(tabId), function () {
+                                });
                             }
                         })
 
