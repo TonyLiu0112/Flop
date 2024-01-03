@@ -27,6 +27,8 @@ function injectScript4Touchpad(tid) {
         function: function () {
             let step = 0;
             let sliding = -500;
+            let stepY = 0;
+            let slidingY = -100;
 
             chrome.storage.sync.get(["sliding_distance"]).then((result) => {
                 if (result !== undefined) {
@@ -34,8 +36,15 @@ function injectScript4Touchpad(tid) {
                 }
 
                 window.addEventListener('wheel', function (event) {
+                    stepY += event.deltaY;
+
                     if (event.deltaX < -20) {
                         step += event.deltaX
+                    }
+
+                    if (stepY < slidingY) {
+                        stepY = 0;
+                        step = 0;
                     }
 
                     if (step < sliding) {
