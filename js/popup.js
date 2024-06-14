@@ -38,7 +38,7 @@ function storage(sliding_distance, click_num) {
             click_num: click_num
         })
         .then(() => {
-            console.log("Value is set");
+            console.log('%c DEBUG[ init ]-65:', 'font-size:13px; background:#E1FFFF; color:#2E8B57;', 'Value is set');
         });
 }
 

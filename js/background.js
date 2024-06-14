@@ -3,22 +3,39 @@ chrome.runtime.onInstalled.addListener(function () {
     storage(-500, 3);
 });
 
+let tabOpenedFromExternal = new Set();
+
+chrome.webNavigation.onCreatedNavigationTarget.addListener(function(details) {
+    tabOpenedFromExternal.add(details.tabId);
+});
+
+chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
+    if (details.frameId === 0 && details.transitionType === 'reload') {
+        console.log('Tab is being refreshed:', details.tabId);
+        removeInjectedScripts(details.tabId);
+    }
+});
+
 chrome.webNavigation.onDOMContentLoaded.addListener(function (details) {
+    if (tabOpenedFromExternal.has(details.tabId)) {
+        tabOpenedFromExternal.delete(details.tabId);
+        const dynamicKey = String(details.tabId);
+        chrome.storage.sync.get([dynamicKey]).then((result) => {
 
-    const dynamicKey = String(details.tabId);
-    chrome.storage.sync.get([dynamicKey]).then((result) => {
+            if (result === undefined || result[dynamicKey] === undefined) {
 
-        if (result === undefined || result[dynamicKey] === undefined) {
+                const keyValueObject = {};
+                keyValueObject[dynamicKey] = details.tabId;
+                chrome.storage.sync.set(keyValueObject, function () {
+                });
 
-            const keyValueObject = {};
-            keyValueObject[dynamicKey] = details.tabId;
-            chrome.storage.sync.set(keyValueObject, function () {
-            });
-
-            injectScript4Touchpad(details.tabId);
-            injectScript4Mouse(details.tabId);
-        }
-    })
+                injectScript4Touchpad(details.tabId);
+                injectScript4Mouse(details.tabId);
+            }
+        })
+    } else {
+        console.log("This tab was opened externally.");
+    }
 });
 
 function injectScript4Touchpad(tid) {
@@ -36,27 +53,45 @@ function injectScript4Touchpad(tid) {
                 }
 
                 window.addEventListener('wheel', function (event) {
-                    stepY += event.deltaY;
-
-                    if (event.deltaX < -20) {
-                        step += event.deltaX
-                    }
-
-                    if (stepY < slidingY) {
+                    if (isScrollableElement(event.target)) {
                         stepY = 0;
                         step = 0;
-                    }
+                    } else {
+                        stepY += event.deltaY;
 
-                    if (step < sliding) {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        window.close();
+                        if (event.deltaX < -20) {
+                            step += event.deltaX
+                        }
+
+                        if (stepY < slidingY) {
+                            stepY = 0;
+                            step = 0;
+                        }
+
+                        if (step < sliding) {
+                            event.stopPropagation();
+                            event.preventDefault();
+                            window.close();
+                        }
                     }
                 });
+
+                function isScrollableElement(element) {
+                    while (element && element !== document.body) {
+                        const style = getComputedStyle(element);
+                        if (style.overflow === 'auto' || style.overflow === 'scroll' || style.overflowX === 'auto' || style.overflowX === 'scroll' || style.overflowY === 'auto' || style.overflowY === 'scroll') {
+                            return true;
+                        }
+                        element = element.parentElement;
+                    }
+                    return false;
+                }
             });
         }
     });
 }
+
+
 
 function injectScript4Mouse(tid) {
     chrome.scripting.executeScript({
@@ -87,6 +122,19 @@ function injectScript4Mouse(tid) {
             });
 
 
+        }
+    });
+}
+
+function removeInjectedScripts(tabId) {
+    chrome.scripting.executeScript({
+        target: { tabId: tabId },
+        function: function (tabId) {
+            if (window.injectedElement) {
+                window.injectedElement.remove();
+                delete window.injectedElement;
+            }
+            console.log('Injected scripts removed.');
         }
     });
 }
