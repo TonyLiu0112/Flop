@@ -80,7 +80,10 @@ function injectScript4Touchpad(tid) {
                     while (element && element !== document.body) {
                         const style = getComputedStyle(element);
                         if (style.overflow === 'auto' || style.overflow === 'scroll' || style.overflowX === 'auto' || style.overflowX === 'scroll' || style.overflowY === 'auto' || style.overflowY === 'scroll') {
-                            return true;
+                            // check remote element has scroll.
+                            if (element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth) {
+                                return true;
+                            }
                         }
                         element = element.parentElement;
                     }
